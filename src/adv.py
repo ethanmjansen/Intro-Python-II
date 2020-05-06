@@ -1,10 +1,12 @@
 from room import Room
+from player import Player
+import os
 
 # Declare all the rooms
 
 room = {
     'outside':  Room("Outside Cave Entrance",
-                     "North of you, the cave mount beckons"),
+                     "North of you, the cave mouth beckons"),
 
     'foyer':    Room("Foyer", """Dim light filters in from the south. Dusty
 passages run north and east."""),
@@ -39,6 +41,12 @@ room['treasure'].s_to = room['narrow']
 
 # Make a new player object that is currently in the 'outside' room.
 
+os.system('cls')
+
+print('Welcome Adventurer!')
+player_name = input('Please enter your name: ')
+player = Player(name=player_name, current_room=room['outside'])
+
 # Write a loop that:
 #
 # * Prints the current room name
@@ -49,3 +57,48 @@ room['treasure'].s_to = room['narrow']
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
+
+os.system('cls')
+
+print(
+    f"""Welcome {player.name}! You find yourself at the {room['outside'].name}.
+{room['outside'].description}"""
+)
+
+while True:
+
+    selection = input(
+        """
+Please pick a direction to go in,
+North(n) South(s) East(e) West(w)
+Quit(q).
+--> """
+    )
+
+    if selection == 'q':
+        os.system('cls')
+        print(f'Thank you for playing {player.name}')
+        break
+
+    
+
+    try:
+        """ Cast input as a string"""
+        selection = str(selection)
+        
+        # print(player.current_room.__dict__)
+
+        if selection in ('n','s','e','w'):
+            # os.system('cls')
+                       
+            if f'{selection}_to' in player.current_room.__dict__:
+                player.current_room = getattr(player.current_room, f'{selection}_to')
+                print(f'\nYou find yourself at the {player.current_room}')
+            else:
+                print("\nThat isn't a valid direction")
+
+        else:
+            print("\nThat isn't a valid direction")
+
+    except TypeError:
+        print('Please enter your choice as n, s, e, w')
