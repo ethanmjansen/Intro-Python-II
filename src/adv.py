@@ -43,6 +43,15 @@ room['treasure'].s_to = room['narrow']
 
 os.system('cls')
 
+print(
+"""
+      /| ________________
+O|===|* >________________>
+      \|  Text Adventure
+	       By: Ethan Jansen
+"""
+)
+
 print('Welcome Adventurer!')
 player_name = input('Please enter your name: ')
 player = Player(name=player_name, current_room=room['outside'])
