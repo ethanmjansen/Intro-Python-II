@@ -1,14 +1,5 @@
 # Implement a class to hold room information. This should have name and
 # description attributes.
-from item import Item
-
-item = {
-    'goose': Item("Goose", "A goose that lays golden eggs!"),
-    
-    'sword': Item("Sword", "Don't hold on to the wrong end."),
-
-    'lantern': Item("Langern", "Shines light in dark places.")
-}
 
 class Room():
     ''' A room class that a player can interact with'''
@@ -37,11 +28,4 @@ class Room():
         else:
             return 'nothing'
 
-if __name__ == '__main__':
-    room = Room("Outside Cave Entrance", 
-    "North of you, the cave mouth beckons...")
-    sword = item['sword']
-    room.add_item(sword)
-    print(room.inventory)
-    room.remove_item(sword)
-    print(room.inventory)
+# if __name__ == '__main__':
