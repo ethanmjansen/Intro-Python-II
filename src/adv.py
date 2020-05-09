@@ -1,10 +1,19 @@
+# Classes
 from room import Room
+from player import Player
+from item import Item
+
+# Utility func to clear screen on all platforms
+from utils import clear_terminal
+
+import sys
+
 
 # Declare all the rooms
 
 room = {
     'outside':  Room("Outside Cave Entrance",
-                     "North of you, the cave mount beckons"),
+                     "North of you, the cave mouth beckons..."),
 
     'foyer':    Room("Foyer", """Dim light filters in from the south. Dusty
 passages run north and east."""),
@@ -21,6 +30,16 @@ chamber! Sadly, it has already been completely emptied by
 earlier adventurers. The only exit is to the south."""),
 }
 
+# Declare all the items
+
+item = {
+    'goose': Item("a goose", "A goose that lays golden eggs!"),
+    
+    'sword': Item("a sword", "Don't hold on to the wrong end."),
+
+    'lantern': Item("a lantern", "Shines light in dark places."),
+}
+
 
 # Link rooms together
 
@@ -33,11 +52,33 @@ room['narrow'].w_to = room['foyer']
 room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
 
+# Add items to rooms
+
+room['foyer'].add_item(item['sword'])
+room['treasure'].add_item(item['goose'])
+room['overlook'].add_item(item['lantern'])
+
 #
 # Main
 #
 
 # Make a new player object that is currently in the 'outside' room.
+
+# Clear screen in preparation for game
+clear_terminal()
+
+print(
+"""
+      /| ________________
+O|===|* >________________>
+      \|  Text Adventure
+	       By: Ethan Jansen
+"""
+)
+
+print('Welcome Adventurer!')
+player_name = input('Please enter your name: ')
+player = Player(name=player_name, current_room=room['outside'])
 
 # Write a loop that:
 #
@@ -49,3 +90,88 @@ room['treasure'].s_to = room['narrow']
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
+
+# Clear screen in preparation for game
+clear_terminal()
+
+print(f"""Welcome {player.name}!""")
+print(f"""You find yourself at the {player.current_room}
+There is {player.current_room.items_in_room()} on the ground.""")
+
+while True:
+
+    selection = input(
+        """
+Please pick a direction, action, or view your intventory:
+North(n) South(s) East(e) West(w)
+Take item(take [name]) Drop item(drop [name])
+View inventory(i)
+Quit(q).
+--> """
+    )
+
+    if selection == 'q':
+        clear_terminal()
+        print(f'Thank you for playing {player.name}!\nUntil next time...')
+        break
+    
+    selection = selection.strip().split()
+    location = f"""You find yourself at the {player.current_room}
+There is {player.current_room.items_in_room()} on the ground."""
+
+    if selection[0] in ('n','s','e','w'):
+        clear_terminal()
+                    
+        if f'{selection[0]}_to' in player.current_room.__dict__:
+            player.current_room = getattr(player.current_room, f'{selection[0]}_to')
+            print(f"""You find yourself at the {player.current_room}
+There is {player.current_room.items_in_room()} on the ground.""")
+        else:
+            print("That isn't a valid direction")
+            print(f"""\nYou find yourself at the {player.current_room}
+There is {player.current_room.items_in_room()} on the ground.""")
+
+    elif selection[0] == 'take':
+        clear_terminal()
+        for item in player.current_room.inventory:
+            if selection[1] in item.name:
+                player.add_item(item)
+                player.current_room.remove_item(item)
+                print(f"""\nYou find yourself at the {player.current_room}
+There is {player.current_room.items_in_room()} on the ground.""")
+
+            else:
+                print(f'{selection[1]} not in room.')
+                print(f"""\nYou find yourself at the {player.current_room}
+There is {player.current_room.items_in_room()} on the ground.""")
+
+    elif selection[0] == 'drop':
+        clear_terminal()
+        for item in player.inventory:
+            if selection[1] in item.name:
+                player.drop_item(item)
+                player.current_room.add_item(item)
+                print(f"""\nYou find yourself at the {player.current_room}
+There is {player.current_room.items_in_room()} on the ground.""")
+
+            else:
+                clear_terminal()
+                print(f'{selection[1]} not in inventory')
+                print(f"""You find yourself at the {player.current_room}
+There is {player.current_room.items_in_room()} on the ground.""")
+
+    elif selection[0] in ('i', 'inventory'):
+        clear_terminal()
+        print(f"{player.name}'s inventory:\n{player.items_in_inventory()}\n\n{location}")
+
+    elif item['goose'] in player.inventory:
+        clear_terminal()
+        print(f"""Congratulations {player.name}!
+You won the game! You found the goose!
+Thank you for playing {player.name}!
+Until next time...""")
+        break
+
+    else:
+        clear_terminal()
+        print(f"""That is not a valid command\n\n{location}""")
